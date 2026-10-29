@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -50,7 +51,7 @@
 </head>
 <body class="bg-stone-100 text-stone-800 antialiased min-h-screen">
 
-  <!-- ==================== 1. 鎖定驗證畫面 (隱私防窺設計) ==================== -->
+  <!-- ==================== 1. 鎖定驗證畫面 ==================== -->
   <div id="lockScreen" class="fixed inset-0 z-50 bg-stone-900 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center border border-stone-100">
       <div class="w-16 h-16 bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
@@ -144,7 +145,7 @@
         </div>
       </header>
 
-      <!-- 主要內容頁面 -->
+      <!-- 主要內容分頁 -->
       <div class="p-4 md:p-8 max-w-6xl mx-auto w-full space-y-6">
 
         <!-- ===== Tab 1: 儀表板 ===== -->
@@ -178,7 +179,7 @@
             </div>
 
             <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
-              <span class="text-xs text-stone-400 font-medium">今日預約客數</span>
+              <span class="text-xs text-stone-400 font-medium">今日排程客數</span>
               <div class="mt-1 flex items-baseline gap-1">
                 <span id="statTodayBookings" class="text-xl md:text-2xl font-black text-emerald-600 font-mono">0</span>
                 <span class="text-xs text-stone-500">位</span>
@@ -224,7 +225,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 class="text-lg font-bold text-stone-800">全部排程紀錄</h2>
-              <p class="text-xs text-stone-400">完整掌握散客與個人預約客排程</p>
+              <p class="text-xs text-stone-400">散客自來客與個人預約客分類排程</p>
             </div>
             <button onclick="openBookingModal()" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-sm font-semibold hover:bg-emerald-800 transition-all flex items-center justify-center gap-1.5 shadow-sm">
               <i class="fa-solid fa-plus"></i><span>新增預約 / 散客</span>
@@ -239,7 +240,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 class="text-lg font-bold text-stone-800">熟客身體檔案 (CRM)</h2>
-              <p class="text-xs text-stone-400">散客不記錄；此處僅收錄個人專屬預約客之緊繃部位與偏好</p>
+              <p class="text-xs text-stone-400">散客不記錄；此處記錄預約熟客的力道偏好與常緊繃部位</p>
             </div>
             <button onclick="openClientModal()" class="px-4 py-2 bg-stone-800 text-white rounded-xl text-sm font-medium hover:bg-black transition-all">
               <i class="fa-solid fa-user-plus mr-1"></i>建立新熟客檔
@@ -253,8 +254,8 @@
         <section id="view-finance" class="tab-view hidden space-y-4">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-bold text-stone-800">財務與結算明細</h2>
-              <p class="text-xs text-stone-400">牌價與傑森實拿核對記錄</p>
+              <h2 class="text-lg font-bold text-stone-800">財務收支明細</h2>
+              <p class="text-xs text-stone-400">牌價與傑森實拿即時核算</p>
             </div>
             <button onclick="exportToCSV()" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold transition-all">
               <i class="fa-solid fa-file-csv mr-1"></i>匯出 CSV 報表
@@ -481,11 +482,11 @@
       <div id="apiKeySection" class="hidden p-3 bg-stone-50 rounded-xl space-y-2 border border-stone-200">
         <label class="block text-xs font-semibold text-stone-700">Google Gemini API Key</label>
         <div class="flex gap-2">
-          <input type="password" id="geminiApiKeyInput" placeholder="貼上 AI Studio API Key" 
+          <input type="password" id="geminiApiKeyInput" placeholder="貼上 AI Studio 產生的金鑰" 
                  class="flex-1 px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-mono">
           <button onclick="saveApiKey()" class="px-3 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium">儲存</button>
         </div>
-        <p class="text-[10px] text-stone-400">金鑰直接加密存於本機瀏覽器，無洩漏風險。</p>
+        <p class="text-[10px] text-stone-400">支援 AQ. 或 AIza 開頭金鑰，安全加密儲存於瀏覽器 LocalStorage。</p>
       </div>
 
       <!-- 快捷指令 -->
@@ -505,7 +506,7 @@
       <div id="aiChatBox" class="flex-1 min-h-[200px] max-h-[300px] overflow-y-auto space-y-2 p-3 bg-stone-50 rounded-2xl border border-stone-100 text-xs">
         <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-stone-700 space-y-1">
           <p class="font-semibold text-emerald-800">傑森你好！我是你的工作站 AI 助手。</p>
-          <p>我可以幫你分析營收佔比、客人偏好，或協助進行後台管理。若填入 Gemini API Key，我還能為你撰寫熟客回訪關懷語！</p>
+          <p>我可以幫你分析營收佔比、客人偏好，或協助進行後台管理。填入 Gemini API Key 即可開啟完整對話與智慧診斷！</p>
         </div>
       </div>
 
@@ -1085,6 +1086,10 @@
     }
     function openAiModal() {
       document.getElementById('aiModal').classList.remove('hidden');
+      const savedKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+      if (savedKey) {
+        document.getElementById('geminiApiKeyInput').value = savedKey;
+      }
     }
     function openClientModal() {
       document.getElementById('clientModal').classList.remove('hidden');
@@ -1127,17 +1132,23 @@
     }
 
     function saveApiKey() {
-      const key = document.getElementById('geminiApiKeyInput').value.trim();
+      let key = document.getElementById('geminiApiKeyInput').value.trim();
+      if (!key) {
+        localStorage.removeItem(STORAGE_KEY_API_KEY);
+        updateApiKeyStatus();
+        alert('已清除 API Key，切換回本地離線模式。');
+        return;
+      }
       localStorage.setItem(STORAGE_KEY_API_KEY, key);
       updateApiKeyStatus();
-      alert('Gemini API Key 已安全儲存！');
+      alert('Gemini API Key 已儲存！');
       document.getElementById('apiKeySection').classList.add('hidden');
     }
 
     function updateApiKeyStatus() {
       const key = localStorage.getItem(STORAGE_KEY_API_KEY);
       const badge = document.getElementById('geminiStatusBadge');
-      if (key) {
+      if (key && key.trim().length > 0) {
         badge.innerText = 'Gemini 智能連線中';
         badge.className = 'text-[10px] text-emerald-600 font-semibold';
       } else {
@@ -1166,19 +1177,27 @@
       appendChatMessage('User', prompt, false);
       input.value = '';
 
-      const apiKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+      let apiKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+      if (apiKey) apiKey = apiKey.trim();
+
       if (!apiKey) {
         setTimeout(() => {
-          appendChatMessage('AI', '目前處於本地模式。你可以點擊右上角 ⚙️ 設定 Google Gemini API Key 來獲得完整智能對話能力。也可以直接點選上方的快捷指令！', true);
+          appendChatMessage('AI', '目前處於本地模式。你可以點擊右上角 ⚙️ 設定 Google Gemini API Key，支援新版 AQ. 或 AIza 開頭金鑰！', true);
         }, 300);
         return;
       }
 
       appendChatMessage('AI', '思考中...', true);
+      
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+        
+        const response = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
           body: JSON.stringify({
             contents: [{
               parts: [{
@@ -1196,14 +1215,24 @@
 
         const data = await response.json();
         const box = document.getElementById('aiChatBox');
-        box.removeChild(box.lastChild);
+        if (box.lastChild) box.removeChild(box.lastChild);
 
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
+        if (!response.ok) {
+          const errMsg = data.error ? data.error.message : 'API 回傳錯誤 (' + response.status + ')';
+          appendChatMessage('AI', `連線異常：${errMsg}\n請確認金鑰權限或重新至 Google AI Studio 複製。`, true);
+          return;
+        }
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           appendChatMessage('AI', data.candidates[0].content.parts[0].text, true);
         } else {
-          appendChatMessage('AI', 'API 回傳錯誤，請確認 Key 是否有效。', true);
+          appendChatMessage('AI', '未收到有效回應內容，請稍後再試。', true);
         }
       } catch (err) {
+        const box = document.getElementById('aiChatBox');
+        if (box.lastChild && box.lastChild.innerText.includes('思考中')) {
+          box.removeChild(box.lastChild);
+        }
         appendChatMessage('AI', '連線失敗：' + err.message, true);
       }
     }
@@ -1247,3 +1276,4 @@
   </script>
 </body>
 </html>
+```
