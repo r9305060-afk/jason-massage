@@ -17,6 +17,13 @@
       -webkit-tap-highlight-color: transparent;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 <body class="bg-stone-100 text-stone-800 antialiased min-h-screen">
@@ -52,7 +59,7 @@
   </div>
 
   <!-- ==================== 2. 主應用程式容器 ==================== -->
-  <div id="appContainer" style="display: none;" class="min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+  <div id="appContainer" class="hidden min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
     
     <!-- 桌面側邊欄 -->
     <aside class="hidden md:flex flex-col w-64 bg-white border-r border-stone-200 p-5 shrink-0">
@@ -279,7 +286,7 @@
     </nav>
   </div>
 
-  <!-- 彈窗區 -->
+  <!-- 新增預約彈窗 -->
   <div id="bookingModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-stone-100">
@@ -517,7 +524,7 @@
   </div>
 
 
-  <!-- ==================== 4. 核心業務邏輯（完全解耦、保證順暢進入） ==================== -->
+  <!-- ==================== 4. 核心業務邏輯（防錯保證版） ==================== -->
   <script>
     const STORAGE_KEY_AUTH = 'jason_massage_authenticated';
     const STORAGE_KEY_PWD = 'jason_massage_password';
@@ -531,18 +538,19 @@
     let currentClientType = 'personal';
 
     function getSystemPassword() {
-      return localStorage.getItem(STORAGE_KEY_PWD) || DEFAULT_PWD;
+      const pwd = localStorage.getItem(STORAGE_KEY_PWD);
+      return (pwd !== null && pwd !== undefined && pwd !== '') ? String(pwd) : DEFAULT_PWD;
     }
 
     // 核心驗證函數
     function checkUnlock() {
-      var input = document.getElementById('unlockPwdInput');
-      var errorMsg = document.getElementById('pwdErrorMsg');
-      var currentPwd = getSystemPassword();
+      const input = document.getElementById('unlockPwdInput');
+      const errorMsg = document.getElementById('pwdErrorMsg');
+      const currentPwd = getSystemPassword();
 
       if (!input) return;
 
-      if (input.value.trim() === currentPwd.trim()) {
+      if (String(input.value).trim() === currentPwd.trim()) {
         if (errorMsg) errorMsg.classList.add('hidden');
         sessionStorage.setItem(STORAGE_KEY_AUTH, 'true');
         revealApp();
@@ -556,34 +564,35 @@
     function forceResetPassword() {
       localStorage.setItem(STORAGE_KEY_PWD, DEFAULT_PWD);
       alert('密碼已恢復為預設值：562004');
-      var input = document.getElementById('unlockPwdInput');
+      const input = document.getElementById('unlockPwdInput');
       if (input) input.value = DEFAULT_PWD;
       checkUnlock();
     }
 
     function lockSystem() {
       sessionStorage.removeItem(STORAGE_KEY_AUTH);
-      var app = document.getElementById('appContainer');
-      var lock = document.getElementById('lockScreen');
-      if (app) app.style.display = 'none';
-      if (lock) lock.style.display = 'flex';
-      var input = document.getElementById('unlockPwdInput');
+      const app = document.getElementById('appContainer');
+      const lock = document.getElementById('lockScreen');
+      if (app) app.classList.add('hidden');
+      if (lock) lock.classList.remove('hidden');
+      const input = document.getElementById('unlockPwdInput');
       if (input) input.value = '';
     }
 
     function revealApp() {
-      var lock = document.getElementById('lockScreen');
-      var app = document.getElementById('appContainer');
-      if (lock) lock.style.display = 'none';
-      if (app) app.style.display = 'flex';
+      const lock = document.getElementById('lockScreen');
+      const app = document.getElementById('appContainer');
+      if (lock) lock.classList.add('hidden');
+      if (app) app.classList.remove('hidden');
 
+      // 延遲執行確保 DOM 排版完全展開
       setTimeout(function() {
         try {
           initAppComponents();
         } catch (e) {
-          console.warn('UI 初始化提醒:', e);
+          console.warn('UI 初始化處理:', e);
         }
-      }, 50);
+      }, 100);
     }
 
     function initAppComponents() {
@@ -591,8 +600,8 @@
       loadAvatar();
       updateApiKeyStatus();
 
-      var todayStr = new Date().toISOString().split('T')[0];
-      var dateInput = document.getElementById('bookingDate');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('bookingDate');
       if (dateInput && !dateInput.value) dateInput.value = todayStr;
     }
 
@@ -607,10 +616,10 @@
 
     function setClientType(type) {
       currentClientType = type;
-      var btnPersonal = document.getElementById('btnTypePersonal');
-      var btnWalkin = document.getElementById('btnTypeWalkin');
-      var phoneField = document.getElementById('clientPhoneField');
-      var nameInput = document.getElementById('bookingClientName');
+      const btnPersonal = document.getElementById('btnTypePersonal');
+      const btnWalkin = document.getElementById('btnTypeWalkin');
+      const phoneField = document.getElementById('clientPhoneField');
+      const nameInput = document.getElementById('bookingClientName');
 
       if (type === 'walkin') {
         btnWalkin.className = "py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold text-center";
@@ -628,8 +637,8 @@
     }
 
     function handleServiceChange() {
-      var serviceVal = document.getElementById('bookingService').value;
-      var customField = document.getElementById('customServiceField');
+      const serviceVal = document.getElementById('bookingService').value;
+      const customField = document.getElementById('customServiceField');
       if (serviceVal === 'custom') {
         customField.classList.remove('hidden');
       } else {
@@ -638,15 +647,15 @@
     }
 
     function applySplit(ratio) {
-      var gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
       if (gross > 0) {
         document.getElementById('bookingNet').value = Math.round(gross * ratio);
       }
     }
 
     function autoCalculateNet() {
-      var gross = parseFloat(document.getElementById('bookingGross').value) || 0;
-      var netInput = document.getElementById('bookingNet');
+      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      const netInput = document.getElementById('bookingNet');
       if (!netInput.value || netInput.value == 0) {
         netInput.value = Math.round(gross * 0.6);
       }
@@ -654,12 +663,12 @@
 
     async function handleSaveBooking(e) {
       e.preventDefault();
-      var serviceSelect = document.getElementById('bookingService').value;
-      var customServiceName = document.getElementById('bookingCustomServiceName').value.trim();
-      var finalService = serviceSelect === 'custom' ? (customServiceName || '自訂服務') : serviceSelect;
-      var bookingId = 'b_' + Date.now();
+      const serviceSelect = document.getElementById('bookingService').value;
+      const customServiceName = document.getElementById('bookingCustomServiceName').value.trim();
+      const finalService = serviceSelect === 'custom' ? (customServiceName || '自訂服務') : serviceSelect;
+      const bookingId = 'b_' + Date.now();
 
-      var bookingData = {
+      const bookingData = {
         clientType: currentClientType,
         clientName: document.getElementById('bookingClientName').value.trim(),
         clientPhone: currentClientType === 'walkin' ? '' : document.getElementById('bookingClientPhone').value.trim(),
@@ -688,7 +697,7 @@
     }
 
     async function toggleComplete(bookingId) {
-      var item = window.bookings.find(function(b) { return b.id === bookingId; });
+      const item = window.bookings.find(function(b) { return b.id === bookingId; });
       if (!item) return;
 
       item.status = item.status === 'completed' ? 'confirmed' : 'completed';
@@ -714,8 +723,8 @@
 
     async function handleSaveClientManual(e) {
       e.preventDefault();
-      var clientId = 'c_' + Date.now();
-      var clientData = {
+      const clientId = 'c_' + Date.now();
+      const clientData = {
         name: document.getElementById('manualClientName').value.trim(),
         phone: document.getElementById('manualClientPhone').value.trim(),
         pressure: document.getElementById('manualClientPressure').value,
@@ -734,17 +743,17 @@
     }
 
     function renderStats() {
-      var now = new Date();
-      var currentMonthStr = now.toISOString().slice(0, 7);
-      var todayStr = now.toISOString().split('T')[0];
+      const now = new Date();
+      const currentMonthStr = now.toISOString().slice(0, 7);
+      const todayStr = now.toISOString().split('T')[0];
 
-      var monthlyGross = 0;
-      var monthlyNet = 0;
-      var monthlyCount = 0;
-      var walkinCount = 0;
-      var bookedCount = 0;
-      var todayCount = 0;
-      var todayNet = 0;
+      let monthlyGross = 0;
+      let monthlyNet = 0;
+      let monthlyCount = 0;
+      let walkinCount = 0;
+      let bookedCount = 0;
+      let todayCount = 0;
+      let todayNet = 0;
 
       window.bookings.forEach(function(b) {
         if (b.date && b.date.startsWith(currentMonthStr)) {
@@ -760,7 +769,7 @@
         }
       });
 
-      var el;
+      let el;
       el = document.getElementById('statMonthlyNet'); if (el) el.innerText = monthlyNet.toLocaleString();
       el = document.getElementById('statMonthlyGross'); if (el) el.innerText = monthlyGross.toLocaleString();
       el = document.getElementById('statMonthlyClients'); if (el) el.innerText = monthlyCount;
@@ -772,10 +781,10 @@
     }
 
     function renderTodayList() {
-      var todayStr = new Date().toISOString().split('T')[0];
-      var listContainer = document.getElementById('todayBookingsList');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const listContainer = document.getElementById('todayBookingsList');
       if (!listContainer) return;
-      var todayItems = window.bookings.filter(function(b) { return b.date === todayStr; });
+      const todayItems = window.bookings.filter(function(b) { return b.date === todayStr; });
 
       if (todayItems.length === 0) {
         listContainer.innerHTML = '<div class="py-8 text-center text-stone-400 text-xs"><i class="fa-solid fa-mug-hot text-2xl mb-2 text-stone-300 block"></i>今日暫無排程，好好放鬆補充體力！</div>';
@@ -808,7 +817,7 @@
     }
 
     function renderAllBookings() {
-      var container = document.getElementById('allBookingsList');
+      const container = document.getElementById('allBookingsList');
       if (!container) return;
       if (window.bookings.length === 0) {
         container.innerHTML = '<p class="text-center text-stone-400 text-xs py-8">尚無任何排程紀錄</p>';
@@ -820,7 +829,7 @@
           '<div class="space-y-1">' +
             '<div class="flex items-center gap-2">' +
               '<span class="text-xs font-mono font-bold text-stone-400">' + item.date + ' ' + item.time + '</span>' +
-              '<span class="text-sm font-bold text-stone-800">' + item.clientName + '</span>' +
+              '<span class="text-sm font-bold text-stone-800">${item.clientName}</span>' +
               '<span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ' + (item.clientType === 'walkin' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') + '">' +
                 (item.clientType === 'walkin' ? '散客' : '預約客') +
               '</span>' +
@@ -843,7 +852,7 @@
     }
 
     window.renderClients = function() {
-      var container = document.getElementById('clientGrid');
+      const container = document.getElementById('clientGrid');
       if (!container) return;
       if (window.clients.length === 0) {
         container.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-8">尚無熟客檔案</p>';
@@ -865,7 +874,7 @@
     };
 
     function renderFinanceTable() {
-      var tbody = document.getElementById('financeTableBody');
+      const tbody = document.getElementById('financeTableBody');
       if (!tbody) return;
       if (window.bookings.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-stone-400">尚無財務收支明細</td></tr>';
@@ -885,19 +894,19 @@
     }
 
     function renderWeeklyChart() {
-      var ctx = document.getElementById('weeklyRevenueChart');
-      if (!ctx) return;
+      const canvas = document.getElementById('weeklyRevenueChart');
+      if (!canvas || !canvas.parentElement || canvas.parentElement.clientHeight === 0) return;
 
-      var labels = [];
-      var dataNet = [];
+      const labels = [];
+      const dataNet = [];
 
-      for (var i = 6; i >= 0; i--) {
-        var d = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
         d.setDate(d.getDate() - i);
-        var dateStr = d.toISOString().split('T')[0];
+        const dateStr = d.toISOString().split('T')[0];
         labels.push((d.getMonth() + 1) + '/' + d.getDate());
 
-        var dayTotal = window.bookings
+        const dayTotal = window.bookings
           .filter(function(b) { return b.date === dateStr; })
           .reduce(function(sum, b) { return sum + (b.net || 0); }, 0);
         dataNet.push(dayTotal);
@@ -908,7 +917,7 @@
       }
 
       try {
-        weeklyChartInstance = new Chart(ctx, {
+        weeklyChartInstance = new Chart(canvas, {
           type: 'line',
           data: {
             labels: labels,
@@ -935,13 +944,13 @@
           }
         });
       } catch (err) {
-        console.warn('Chart 提示:', err);
+        console.warn('Chart 渲染略過:', err);
       }
     }
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-view').forEach(function(v) { v.classList.add('hidden'); });
-      var activeView = document.getElementById('view-' + tabId);
+      const activeView = document.getElementById('view-' + tabId);
       if (activeView) activeView.classList.remove('hidden');
 
       document.querySelectorAll('.nav-btn').forEach(function(btn) {
@@ -966,9 +975,9 @@
     }
 
     function loadAvatar() {
-      var saved = localStorage.getItem(STORAGE_KEY_AVATAR);
+      const saved = localStorage.getItem(STORAGE_KEY_AVATAR);
       if (saved) {
-        var el;
+        let el;
         el = document.getElementById('sidebarAvatar'); if (el) el.src = saved;
         el = document.getElementById('mobileAvatar'); if (el) el.src = saved;
         el = document.getElementById('avatarPreview'); if (el) el.src = saved;
@@ -976,7 +985,7 @@
     }
 
     function saveAvatar() {
-      var urlInput = document.getElementById('avatarUrlInput').value.trim();
+      const urlInput = document.getElementById('avatarUrlInput').value.trim();
       if (urlInput) {
         localStorage.setItem(STORAGE_KEY_AVATAR, urlInput);
         loadAvatar();
@@ -985,11 +994,11 @@
     }
 
     function handleAvatarFile(e) {
-      var file = e.target.files[0];
+      const file = e.target.files[0];
       if (file) {
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function(event) {
-          var base64 = event.target.result;
+          const base64 = event.target.result;
           localStorage.setItem(STORAGE_KEY_AVATAR, base64);
           loadAvatar();
           closeModal('avatarModal');
@@ -1005,15 +1014,15 @@
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     function exportToCSV() {
-      var csvContent = "\uFEFF";
+      let csvContent = "\uFEFF";
       csvContent += "日期,時間,客源類型,客戶姓名,項目,時長(分),牌價,傑森實拿,備註\n";
 
       window.bookings.forEach(function(b) {
         csvContent += '"' + b.date + '","' + b.time + '","' + (b.clientType === 'walkin' ? '散客' : '預約') + '","' + b.clientName + '","' + b.service + '","' + (b.duration || 60) + '","' + b.gross + '","' + b.net + '","' + (b.notes || '') + '"\n';
       });
 
-      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      var link = document.createElement("a");
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = '傑森按摩天地_收支報表_' + new Date().toISOString().split('T')[0] + '.csv';
       link.click();
@@ -1024,7 +1033,7 @@
     }
 
     function saveApiKey() {
-      var key = document.getElementById('geminiApiKeyInput').value.trim();
+      const key = document.getElementById('geminiApiKeyInput').value.trim();
       localStorage.setItem(STORAGE_KEY_API_KEY, key);
       updateApiKeyStatus();
       alert('Gemini API Key 已儲存！');
@@ -1032,8 +1041,8 @@
     }
 
     function updateApiKeyStatus() {
-      var key = localStorage.getItem(STORAGE_KEY_API_KEY);
-      var badge = document.getElementById('geminiStatusBadge');
+      const key = localStorage.getItem(STORAGE_KEY_API_KEY);
+      const badge = document.getElementById('geminiStatusBadge');
       if (!badge) return;
       if (key) {
         badge.innerText = 'Gemini 智能連線中';
@@ -1045,9 +1054,9 @@
     }
 
     function appendChatMessage(sender, text, isAi) {
-      var box = document.getElementById('aiChatBox');
+      const box = document.getElementById('aiChatBox');
       if (!box) return;
-      var div = document.createElement('div');
+      const div = document.createElement('div');
       div.className = isAi 
         ? "bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-stone-700 space-y-1"
         : "bg-emerald-700 text-white p-2.5 rounded-2xl rounded-tr-none ml-auto max-w-[85%] text-right";
@@ -1058,14 +1067,14 @@
 
     async function handleAiChat(e) {
       e.preventDefault();
-      var input = document.getElementById('aiInput');
-      var prompt = input.value.trim();
+      const input = document.getElementById('aiInput');
+      const prompt = input.value.trim();
       if (!prompt) return;
 
       appendChatMessage('User', prompt, false);
       input.value = '';
 
-      var rawKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+      const rawKey = localStorage.getItem(STORAGE_KEY_API_KEY);
       if (!rawKey) {
         setTimeout(function() {
           appendChatMessage('AI', '目前處於本地模式。你可以點擊右上角 ⚙️ 設定 Google Gemini API Key 來獲得完整智能對話能力。也可以直接點選上方的快捷指令！', true);
@@ -1074,10 +1083,10 @@
       }
 
       appendChatMessage('AI', '思考中...', true);
-      var cleanKey = rawKey.trim();
+      const cleanKey = rawKey.trim();
 
       try {
-        var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -1092,8 +1101,8 @@
           })
         });
 
-        var data = await response.json();
-        var box = document.getElementById('aiChatBox');
+        const data = await response.json();
+        const box = document.getElementById('aiChatBox');
         if (box && box.lastChild) box.removeChild(box.lastChild);
 
         if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
@@ -1102,7 +1111,7 @@
           appendChatMessage('AI', '連線回傳錯誤：' + (data.error ? data.error.message : '請檢查金鑰或網路'), true);
         }
       } catch (err) {
-        var b = document.getElementById('aiChatBox');
+        const b = document.getElementById('aiChatBox');
         if (b && b.lastChild) b.removeChild(b.lastChild);
         appendChatMessage('AI', '連線異常：' + err.message, true);
       }
@@ -1110,25 +1119,25 @@
 
     function runAiQuickCommand(cmd) {
       if (cmd === 'diagnose') {
-        var walkin = window.bookings.filter(function(b) { return b.clientType === 'walkin'; }).length;
-        var personal = window.bookings.filter(function(b) { return b.clientType === 'personal'; }).length;
-        var total = window.bookings.reduce(function(sum, b) { return sum + (b.net || 0); }, 0);
+        const walkin = window.bookings.filter(function(b) { return b.clientType === 'walkin'; }).length;
+        const personal = window.bookings.filter(function(b) { return b.clientType === 'personal'; }).length;
+        const total = window.bookings.reduce(function(sum, b) { return sum + (b.net || 0); }, 0);
         appendChatMessage('AI', '📊 傑森的營運簡報：\n- 總實拿：NT$ ' + total.toLocaleString() + '\n- 熟客比例：' + (window.bookings.length ? Math.round((personal/window.bookings.length)*100) : 0) + '%\n- 散客比例：' + (window.bookings.length ? Math.round((walkin/window.bookings.length)*100) : 0) + '%\n建議：主動記錄熟客常繃部位，在回訪時先一步關心！', true);
       } else if (cmd === 'password') {
-        var newPwd = prompt('請輸入新的訪問密碼：', getSystemPassword());
+        const newPwd = prompt('請輸入新的訪問密碼：', getSystemPassword());
         if (newPwd) {
           localStorage.setItem(STORAGE_KEY_PWD, newPwd.trim());
           appendChatMessage('AI', '✅ 訪問密碼已成功更新！', true);
         }
       } else if (cmd === 'backup') {
-        var backupData = {
+        const backupData = {
           bookings: window.bookings,
           clients: window.clients,
           password: getSystemPassword(),
           exportedAt: new Date().toISOString()
         };
-        var blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-        var link = document.createElement("a");
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = '傑森按摩天地_全站備份_' + new Date().toISOString().split('T')[0] + '.json';
         link.click();
@@ -1138,7 +1147,7 @@
 
     // 鍵盤監聽與初期檢查
     window.addEventListener('DOMContentLoaded', function() {
-      var pwdInput = document.getElementById('unlockPwdInput');
+      const pwdInput = document.getElementById('unlockPwdInput');
       if (pwdInput) {
         pwdInput.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') checkUnlock();
