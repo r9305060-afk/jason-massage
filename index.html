@@ -17,13 +17,6 @@
       -webkit-tap-highlight-color: transparent;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .hide-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .hide-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
   </style>
 </head>
 <body class="bg-stone-100 text-stone-800 antialiased min-h-screen">
@@ -59,7 +52,7 @@
   </div>
 
   <!-- ==================== 2. 主應用程式容器 ==================== -->
-  <div id="appContainer" class="hidden min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+  <div id="appContainer" style="display: none;" class="min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
     
     <!-- 桌面側邊欄 -->
     <aside class="hidden md:flex flex-col w-64 bg-white border-r border-stone-200 p-5 shrink-0">
@@ -96,7 +89,6 @@
         </button>
       </nav>
 
-      <!-- 側欄底部動作 -->
       <div class="pt-4 border-t border-stone-100 space-y-2">
         <button onclick="openAiModal()" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-xs font-semibold rounded-xl shadow-sm hover:opacity-90 transition-all">
           <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI 後台助理</span>
@@ -189,12 +181,10 @@
                 </button>
               </div>
 
-              <div id="todayBookingsList" class="space-y-2.5">
-                <!-- 今日預約卡片 -->
-              </div>
+              <div id="todayBookingsList" class="space-y-2.5"></div>
             </div>
 
-            <!-- 近 7 天實拿走勢 -->
+            <!-- 近 7 天走勢 -->
             <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
               <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
                 <i class="fa-solid fa-chart-line text-emerald-600"></i>
@@ -216,9 +206,7 @@
             </button>
           </div>
 
-          <div id="allBookingsList" class="space-y-3">
-            <!-- 排程列表 -->
-          </div>
+          <div id="allBookingsList" class="space-y-3"></div>
         </section>
 
         <!-- ===== Tab 3: 熟客身體檔案 ===== -->
@@ -233,9 +221,7 @@
             </button>
           </div>
 
-          <div id="clientGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <!-- 熟客卡片 -->
-          </div>
+          <div id="clientGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- ===== Tab 4: 財務收支 ===== -->
@@ -260,9 +246,7 @@
                     <th class="p-3.5 text-right text-emerald-700">傑森實拿</th>
                   </tr>
                 </thead>
-                <tbody id="financeTableBody" class="divide-y divide-stone-100 font-medium">
-                  <!-- 明細列表 -->
-                </tbody>
+                <tbody id="financeTableBody" class="divide-y divide-stone-100 font-medium"></tbody>
               </table>
             </div>
           </div>
@@ -295,9 +279,7 @@
     </nav>
   </div>
 
-  <!-- ==================== 3. 模態彈窗區 ==================== -->
-
-  <!-- 新增預約彈窗 -->
+  <!-- 彈窗區 -->
   <div id="bookingModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between pb-3 border-b border-stone-100">
@@ -535,7 +517,7 @@
   </div>
 
 
-  <!-- ==================== 4. 核心業務邏輯（零外部相依，確保秒進） ==================== -->
+  <!-- ==================== 4. 核心業務邏輯（完全解耦、保證順暢進入） ==================== -->
   <script>
     const STORAGE_KEY_AUTH = 'jason_massage_authenticated';
     const STORAGE_KEY_PWD = 'jason_massage_password';
@@ -552,11 +534,13 @@
       return localStorage.getItem(STORAGE_KEY_PWD) || DEFAULT_PWD;
     }
 
-    // 核心驗證函數：保證不受任何其他代碼阻礙
+    // 核心驗證函數
     function checkUnlock() {
-      const input = document.getElementById('unlockPwdInput');
-      const errorMsg = document.getElementById('pwdErrorMsg');
-      const currentPwd = getSystemPassword();
+      var input = document.getElementById('unlockPwdInput');
+      var errorMsg = document.getElementById('pwdErrorMsg');
+      var currentPwd = getSystemPassword();
+
+      if (!input) return;
 
       if (input.value.trim() === currentPwd.trim()) {
         if (errorMsg) errorMsg.classList.add('hidden');
@@ -572,39 +556,43 @@
     function forceResetPassword() {
       localStorage.setItem(STORAGE_KEY_PWD, DEFAULT_PWD);
       alert('密碼已恢復為預設值：562004');
-      const input = document.getElementById('unlockPwdInput');
-      input.value = DEFAULT_PWD;
+      var input = document.getElementById('unlockPwdInput');
+      if (input) input.value = DEFAULT_PWD;
       checkUnlock();
     }
 
     function lockSystem() {
       sessionStorage.removeItem(STORAGE_KEY_AUTH);
-      document.getElementById('appContainer').classList.add('hidden');
-      document.getElementById('lockScreen').classList.remove('hidden');
-      document.getElementById('unlockPwdInput').value = '';
+      var app = document.getElementById('appContainer');
+      var lock = document.getElementById('lockScreen');
+      if (app) app.style.display = 'none';
+      if (lock) lock.style.display = 'flex';
+      var input = document.getElementById('unlockPwdInput');
+      if (input) input.value = '';
     }
 
     function revealApp() {
-      document.getElementById('lockScreen').classList.add('hidden');
-      document.getElementById('appContainer').classList.remove('hidden');
-      try {
-        initAppComponents();
-      } catch (e) {
-        console.warn('UI 初始化容錯處理:', e);
-      }
-    }
+      var lock = document.getElementById('lockScreen');
+      var app = document.getElementById('appContainer');
+      if (lock) lock.style.display = 'none';
+      if (app) app.style.display = 'flex';
 
-    document.getElementById('unlockPwdInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') checkUnlock();
-    });
+      setTimeout(function() {
+        try {
+          initAppComponents();
+        } catch (e) {
+          console.warn('UI 初始化提醒:', e);
+        }
+      }, 50);
+    }
 
     function initAppComponents() {
       renderAllViews();
       loadAvatar();
       updateApiKeyStatus();
 
-      const todayStr = new Date().toISOString().split('T')[0];
-      const dateInput = document.getElementById('bookingDate');
+      var todayStr = new Date().toISOString().split('T')[0];
+      var dateInput = document.getElementById('bookingDate');
       if (dateInput && !dateInput.value) dateInput.value = todayStr;
     }
 
@@ -619,10 +607,10 @@
 
     function setClientType(type) {
       currentClientType = type;
-      const btnPersonal = document.getElementById('btnTypePersonal');
-      const btnWalkin = document.getElementById('btnTypeWalkin');
-      const phoneField = document.getElementById('clientPhoneField');
-      const nameInput = document.getElementById('bookingClientName');
+      var btnPersonal = document.getElementById('btnTypePersonal');
+      var btnWalkin = document.getElementById('btnTypeWalkin');
+      var phoneField = document.getElementById('clientPhoneField');
+      var nameInput = document.getElementById('bookingClientName');
 
       if (type === 'walkin') {
         btnWalkin.className = "py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold text-center";
@@ -640,8 +628,8 @@
     }
 
     function handleServiceChange() {
-      const serviceVal = document.getElementById('bookingService').value;
-      const customField = document.getElementById('customServiceField');
+      var serviceVal = document.getElementById('bookingService').value;
+      var customField = document.getElementById('customServiceField');
       if (serviceVal === 'custom') {
         customField.classList.remove('hidden');
       } else {
@@ -650,29 +638,28 @@
     }
 
     function applySplit(ratio) {
-      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      var gross = parseFloat(document.getElementById('bookingGross').value) || 0;
       if (gross > 0) {
         document.getElementById('bookingNet').value = Math.round(gross * ratio);
       }
     }
 
     function autoCalculateNet() {
-      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
-      const netInput = document.getElementById('bookingNet');
+      var gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      var netInput = document.getElementById('bookingNet');
       if (!netInput.value || netInput.value == 0) {
         netInput.value = Math.round(gross * 0.6);
       }
     }
 
-    // 儲存預約
     async function handleSaveBooking(e) {
       e.preventDefault();
-      const serviceSelect = document.getElementById('bookingService').value;
-      const customServiceName = document.getElementById('bookingCustomServiceName').value.trim();
-      const finalService = serviceSelect === 'custom' ? (customServiceName || '自訂服務') : serviceSelect;
-      const bookingId = 'b_' + Date.now();
+      var serviceSelect = document.getElementById('bookingService').value;
+      var customServiceName = document.getElementById('bookingCustomServiceName').value.trim();
+      var finalService = serviceSelect === 'custom' ? (customServiceName || '自訂服務') : serviceSelect;
+      var bookingId = 'b_' + Date.now();
 
-      const bookingData = {
+      var bookingData = {
         clientType: currentClientType,
         clientName: document.getElementById('bookingClientName').value.trim(),
         clientPhone: currentClientType === 'walkin' ? '' : document.getElementById('bookingClientPhone').value.trim(),
@@ -687,12 +674,10 @@
         createdAt: new Date().toISOString()
       };
 
-      // 本地優先更新
       window.bookings.unshift({ id: bookingId, ...bookingData });
       localStorage.setItem('jason_massage_bookings', JSON.stringify(window.bookings));
       window.renderAllViews();
 
-      // 若有雲端則背景同步
       if (window.cloudSyncBooking) {
         window.cloudSyncBooking(bookingId, bookingData);
       }
@@ -702,9 +687,8 @@
       setClientType('personal');
     }
 
-    // 切換預約狀態
     async function toggleComplete(bookingId) {
-      const item = window.bookings.find(b => b.id === bookingId);
+      var item = window.bookings.find(function(b) { return b.id === bookingId; });
       if (!item) return;
 
       item.status = item.status === 'completed' ? 'confirmed' : 'completed';
@@ -716,11 +700,10 @@
       }
     }
 
-    // 刪除預約
     async function deleteBooking(bookingId) {
       if (!confirm('確定要刪除這筆排程紀錄嗎？')) return;
 
-      window.bookings = window.bookings.filter(b => b.id !== bookingId);
+      window.bookings = window.bookings.filter(function(b) { return b.id !== bookingId; });
       localStorage.setItem('jason_massage_bookings', JSON.stringify(window.bookings));
       window.renderAllViews();
 
@@ -729,11 +712,10 @@
       }
     }
 
-    // 手動新增客戶
     async function handleSaveClientManual(e) {
       e.preventDefault();
-      const clientId = 'c_' + Date.now();
-      const clientData = {
+      var clientId = 'c_' + Date.now();
+      var clientData = {
         name: document.getElementById('manualClientName').value.trim(),
         phone: document.getElementById('manualClientPhone').value.trim(),
         pressure: document.getElementById('manualClientPressure').value,
@@ -752,19 +734,19 @@
     }
 
     function renderStats() {
-      const now = new Date();
-      const currentMonthStr = now.toISOString().slice(0, 7);
-      const todayStr = now.toISOString().split('T')[0];
+      var now = new Date();
+      var currentMonthStr = now.toISOString().slice(0, 7);
+      var todayStr = now.toISOString().split('T')[0];
 
-      let monthlyGross = 0;
-      let monthlyNet = 0;
-      let monthlyCount = 0;
-      let walkinCount = 0;
-      let bookedCount = 0;
-      let todayCount = 0;
-      let todayNet = 0;
+      var monthlyGross = 0;
+      var monthlyNet = 0;
+      var monthlyCount = 0;
+      var walkinCount = 0;
+      var bookedCount = 0;
+      var todayCount = 0;
+      var todayNet = 0;
 
-      window.bookings.forEach(b => {
+      window.bookings.forEach(function(b) {
         if (b.date && b.date.startsWith(currentMonthStr)) {
           monthlyGross += (b.gross || 0);
           monthlyNet += (b.net || 0);
@@ -778,150 +760,146 @@
         }
       });
 
-      document.getElementById('statMonthlyNet').innerText = monthlyNet.toLocaleString();
-      document.getElementById('statMonthlyGross').innerText = monthlyGross.toLocaleString();
-      document.getElementById('statMonthlyClients').innerText = monthlyCount;
-      document.getElementById('statWalkinCount').innerText = walkinCount;
-      document.getElementById('statBookedCount').innerText = bookedCount;
-      document.getElementById('statAvgNetPerClient').innerText = monthlyCount > 0 ? Math.round(monthlyNet / monthlyCount).toLocaleString() : 0;
-      document.getElementById('statTodayBookings').innerText = todayCount;
-      document.getElementById('statTodayNet').innerText = todayNet.toLocaleString();
+      var el;
+      el = document.getElementById('statMonthlyNet'); if (el) el.innerText = monthlyNet.toLocaleString();
+      el = document.getElementById('statMonthlyGross'); if (el) el.innerText = monthlyGross.toLocaleString();
+      el = document.getElementById('statMonthlyClients'); if (el) el.innerText = monthlyCount;
+      el = document.getElementById('statWalkinCount'); if (el) el.innerText = walkinCount;
+      el = document.getElementById('statBookedCount'); if (el) el.innerText = bookedCount;
+      el = document.getElementById('statAvgNetPerClient'); if (el) el.innerText = monthlyCount > 0 ? Math.round(monthlyNet / monthlyCount).toLocaleString() : 0;
+      el = document.getElementById('statTodayBookings'); if (el) el.innerText = todayCount;
+      el = document.getElementById('statTodayNet'); if (el) el.innerText = todayNet.toLocaleString();
     }
 
     function renderTodayList() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const listContainer = document.getElementById('todayBookingsList');
-      const todayItems = window.bookings.filter(b => b.date === todayStr);
+      var todayStr = new Date().toISOString().split('T')[0];
+      var listContainer = document.getElementById('todayBookingsList');
+      if (!listContainer) return;
+      var todayItems = window.bookings.filter(function(b) { return b.date === todayStr; });
 
       if (todayItems.length === 0) {
-        listContainer.innerHTML = `
-          <div class="py-8 text-center text-stone-400 text-xs">
-            <i class="fa-solid fa-mug-hot text-2xl mb-2 text-stone-300 block"></i>
-            今日暫無排程，好好放鬆補充體力！
-          </div>
-        `;
+        listContainer.innerHTML = '<div class="py-8 text-center text-stone-400 text-xs"><i class="fa-solid fa-mug-hot text-2xl mb-2 text-stone-300 block"></i>今日暫無排程，好好放鬆補充體力！</div>';
         return;
       }
 
-      listContainer.innerHTML = todayItems.map(item => `
-        <div class="p-3.5 rounded-xl border ${item.status === 'completed' ? 'bg-stone-50 border-stone-200 opacity-60' : 'bg-emerald-50/40 border-emerald-200'} flex items-center justify-between transition-all">
-          <div class="flex items-center gap-3">
-            <div class="font-mono text-xs font-bold ${item.status === 'completed' ? 'text-stone-400' : 'text-emerald-800'}">
-              ${item.time || '--:--'}
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-bold text-stone-800">${item.clientName}</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${item.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
-                  ${item.clientType === 'walkin' ? '散客' : '預約'}
-                </span>
-              </div>
-              <p class="text-xs text-stone-500 mt-0.5">
-                ${item.service} (${item.duration || 60}分) · 實拿 NT$${item.net}
-              </p>
-            </div>
-          </div>
-          <button onclick="toggleComplete('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${item.status === 'completed' ? 'bg-stone-200 text-stone-600' : 'bg-emerald-700 text-white shadow-sm'}">
-            ${item.status === 'completed' ? '已完成' : '一鍵結案'}
-          </button>
-        </div>
-      `).join('');
+      listContainer.innerHTML = todayItems.map(function(item) {
+        return '<div class="p-3.5 rounded-xl border ' + (item.status === 'completed' ? 'bg-stone-50 border-stone-200 opacity-60' : 'bg-emerald-50/40 border-emerald-200') + ' flex items-center justify-between transition-all">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="font-mono text-xs font-bold ' + (item.status === 'completed' ? 'text-stone-400' : 'text-emerald-800') + '">' +
+              (item.time || '--:--') +
+            '</div>' +
+            '<div>' +
+              '<div class="flex items-center gap-2">' +
+                '<span class="text-sm font-bold text-stone-800">' + item.clientName + '</span>' +
+                '<span class="text-[10px] px-2 py-0.5 rounded-full font-medium ' + (item.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') + '">' +
+                  (item.clientType === 'walkin' ? '散客' : '預約') +
+                '</span>' +
+              '</div>' +
+              '<p class="text-xs text-stone-500 mt-0.5">' +
+                item.service + ' (' + (item.duration || 60) + '分) · 實拿 NT$' + item.net +
+              '</p>' +
+            '</div>' +
+          '</div>' +
+          '<button onclick="toggleComplete(\'' + item.id + '\')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ' + (item.status === 'completed' ? 'bg-stone-200 text-stone-600' : 'bg-emerald-700 text-white shadow-sm') + '">' +
+            (item.status === 'completed' ? '已完成' : '一鍵結案') +
+          '</button>' +
+        '</div>';
+      }).join('');
     }
 
     function renderAllBookings() {
-      const container = document.getElementById('allBookingsList');
+      var container = document.getElementById('allBookingsList');
+      if (!container) return;
       if (window.bookings.length === 0) {
-        container.innerHTML = `<p class="text-center text-stone-400 text-xs py-8">尚無任何排程紀錄</p>`;
+        container.innerHTML = '<p class="text-center text-stone-400 text-xs py-8">尚無任何排程紀錄</p>';
         return;
       }
 
-      container.innerHTML = window.bookings.map(item => `
-        <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-mono font-bold text-stone-400">${item.date} ${item.time}</span>
-              <span class="text-sm font-bold text-stone-800">${item.clientName}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${item.clientType === 'walkin' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}">
-                ${item.clientType === 'walkin' ? '散客' : '預約客'}
-              </span>
-            </div>
-            <div class="text-xs text-stone-500">
-              ${item.service} · ${item.duration || 60}分鐘 · 牌價 NT$${item.gross} · <strong class="text-emerald-700">傑森實拿 NT$${item.net}</strong>
-            </div>
-            ${item.notes ? `<div class="text-xs text-stone-400 italic">備註：${item.notes}</div>` : ''}
-          </div>
-          <div class="flex items-center gap-2 self-end sm:self-auto">
-            <button onclick="toggleComplete('${item.id}')" class="px-3 py-1.5 rounded-xl text-xs font-medium ${item.status === 'completed' ? 'bg-stone-100 text-stone-500' : 'bg-emerald-100 text-emerald-800'}">
-              ${item.status === 'completed' ? '設為未結案' : '標記完成'}
-            </button>
-            <button onclick="deleteBooking('${item.id}')" class="p-1.5 text-stone-300 hover:text-red-500 transition-colors">
-              <i class="fa-solid fa-trash-can text-sm"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
+      container.innerHTML = window.bookings.map(function(item) {
+        return '<div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">' +
+          '<div class="space-y-1">' +
+            '<div class="flex items-center gap-2">' +
+              '<span class="text-xs font-mono font-bold text-stone-400">' + item.date + ' ' + item.time + '</span>' +
+              '<span class="text-sm font-bold text-stone-800">' + item.clientName + '</span>' +
+              '<span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ' + (item.clientType === 'walkin' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700') + '">' +
+                (item.clientType === 'walkin' ? '散客' : '預約客') +
+              '</span>' +
+            '</div>' +
+            '<div class="text-xs text-stone-500">' +
+              item.service + ' · ' + (item.duration || 60) + '分鐘 · 牌價 NT$' + item.gross + ' · <strong class="text-emerald-700">傑森實拿 NT$' + item.net + '</strong>' +
+            '</div>' +
+            (item.notes ? '<div class="text-xs text-stone-400 italic">備註：' + item.notes + '</div>' : '') +
+          '</div>' +
+          '<div class="flex items-center gap-2 self-end sm:self-auto">' +
+            '<button onclick="toggleComplete(\'' + item.id + '\')" class="px-3 py-1.5 rounded-xl text-xs font-medium ' + (item.status === 'completed' ? 'bg-stone-100 text-stone-500' : 'bg-emerald-100 text-emerald-800') + '">' +
+              (item.status === 'completed' ? '設為未結案' : '標記完成') +
+            '</button>' +
+            '<button onclick="deleteBooking(\'' + item.id + '\')" class="p-1.5 text-stone-300 hover:text-red-500 transition-colors">' +
+              '<i class="fa-solid fa-trash-can text-sm"></i>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
     }
 
     window.renderClients = function() {
-      const container = document.getElementById('clientGrid');
+      var container = document.getElementById('clientGrid');
+      if (!container) return;
       if (window.clients.length === 0) {
-        container.innerHTML = `<p class="col-span-full text-center text-stone-400 text-xs py-8">尚無熟客檔案</p>`;
+        container.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-8">尚無熟客檔案</p>';
         return;
       }
 
-      container.innerHTML = window.clients.map(c => `
-        <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-stone-800 text-sm">${c.name}</span>
-            <span class="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 font-medium">${c.pressure || '適中'}</span>
-          </div>
-          <p class="text-xs font-mono text-stone-400"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${c.phone || '無電話'}</p>
-          <div class="pt-2 border-t border-stone-100 text-xs text-stone-500">
-            ${c.notes || '尚未填寫身體狀況偏好'}
-          </div>
-        </div>
-      `).join('');
+      container.innerHTML = window.clients.map(function(c) {
+        return '<div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm space-y-2">' +
+          '<div class="flex items-center justify-between">' +
+            '<span class="font-bold text-stone-800 text-sm">' + c.name + '</span>' +
+            '<span class="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 font-medium">' + (c.pressure || '適中') + '</span>' +
+          '</div>' +
+          '<p class="text-xs font-mono text-stone-400"><i class="fa-solid fa-phone text-[10px] mr-1"></i>' + (c.phone || '無電話') + '</p>' +
+          '<div class="pt-2 border-t border-stone-100 text-xs text-stone-500">' +
+            (c.notes || '尚未填寫身體狀況偏好') +
+          '</div>' +
+        '</div>';
+      }).join('');
     };
 
     function renderFinanceTable() {
-      const tbody = document.getElementById('financeTableBody');
+      var tbody = document.getElementById('financeTableBody');
+      if (!tbody) return;
       if (window.bookings.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-stone-400">尚無財務收支明細</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-stone-400">尚無財務收支明細</td></tr>';
         return;
       }
 
-      tbody.innerHTML = window.bookings.map(b => `
-        <tr class="hover:bg-stone-50/80 transition-colors">
-          <td class="p-3.5 font-mono text-stone-500">${b.date} ${b.time}</td>
-          <td class="p-3.5">
-            <span class="text-[10px] px-2 py-0.5 rounded-md ${b.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
-              ${b.clientType === 'walkin' ? '散客' : '預約'}
-            </span>
-          </td>
-          <td class="p-3.5 font-bold text-stone-800">${b.clientName}</td>
-          <td class="p-3.5">${b.service} (${b.duration || 60}分)</td>
-          <td class="p-3.5 text-right font-mono text-stone-400">NT$ ${b.gross || 0}</td>
-          <td class="p-3.5 text-right font-mono font-bold text-emerald-700">NT$ ${b.net || 0}</td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = window.bookings.map(function(b) {
+        return '<tr class="hover:bg-stone-50/80 transition-colors">' +
+          '<td class="p-3.5 font-mono text-stone-500">' + b.date + ' ' + b.time + '</td>' +
+          '<td class="p-3.5"><span class="text-[10px] px-2 py-0.5 rounded-md ' + (b.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') + '">' + (b.clientType === 'walkin' ? '散客' : '預約') + '</span></td>' +
+          '<td class="p-3.5 font-bold text-stone-800">' + b.clientName + '</td>' +
+          '<td class="p-3.5">' + b.service + ' (' + (b.duration || 60) + '分)</td>' +
+          '<td class="p-3.5 text-right font-mono text-stone-400">NT$ ' + (b.gross || 0) + '</td>' +
+          '<td class="p-3.5 text-right font-mono font-bold text-emerald-700">NT$ ' + (b.net || 0) + '</td>' +
+        '</tr>';
+      }).join('');
     }
 
     function renderWeeklyChart() {
-      const ctx = document.getElementById('weeklyRevenueChart');
+      var ctx = document.getElementById('weeklyRevenueChart');
       if (!ctx) return;
 
-      const labels = [];
-      const dataNet = [];
+      var labels = [];
+      var dataNet = [];
 
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
+      for (var i = 6; i >= 0; i--) {
+        var d = new Date();
         d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+        var dateStr = d.toISOString().split('T')[0];
+        labels.push((d.getMonth() + 1) + '/' + d.getDate());
 
-        const dayTotal = window.bookings
-          .filter(b => b.date === dateStr)
-          .reduce((sum, b) => sum + (b.net || 0), 0);
+        var dayTotal = window.bookings
+          .filter(function(b) { return b.date === dateStr; })
+          .reduce(function(sum, b) { return sum + (b.net || 0); }, 0);
         dataNet.push(dayTotal);
       }
 
@@ -957,16 +935,16 @@
           }
         });
       } catch (err) {
-        console.warn('Chart 延遲載入:', err);
+        console.warn('Chart 提示:', err);
       }
     }
 
     function switchTab(tabId) {
-      document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
-      const activeView = document.getElementById('view-' + tabId);
+      document.querySelectorAll('.tab-view').forEach(function(v) { v.classList.add('hidden'); });
+      var activeView = document.getElementById('view-' + tabId);
       if (activeView) activeView.classList.remove('hidden');
 
-      document.querySelectorAll('.nav-btn').forEach(btn => {
+      document.querySelectorAll('.nav-btn').forEach(function(btn) {
         if (btn.getAttribute('data-tab') === tabId) {
           btn.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-800 bg-emerald-50 transition-all";
         } else {
@@ -974,7 +952,7 @@
         }
       });
 
-      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+      document.querySelectorAll('.mobile-nav-btn').forEach(function(btn) {
         if (btn.getAttribute('data-tab') === tabId) {
           btn.className = "mobile-nav-btn flex flex-col items-center text-emerald-800";
         } else {
@@ -988,16 +966,17 @@
     }
 
     function loadAvatar() {
-      const saved = localStorage.getItem(STORAGE_KEY_AVATAR);
+      var saved = localStorage.getItem(STORAGE_KEY_AVATAR);
       if (saved) {
-        document.getElementById('sidebarAvatar').src = saved;
-        document.getElementById('mobileAvatar').src = saved;
-        document.getElementById('avatarPreview').src = saved;
+        var el;
+        el = document.getElementById('sidebarAvatar'); if (el) el.src = saved;
+        el = document.getElementById('mobileAvatar'); if (el) el.src = saved;
+        el = document.getElementById('avatarPreview'); if (el) el.src = saved;
       }
     }
 
     function saveAvatar() {
-      const urlInput = document.getElementById('avatarUrlInput').value.trim();
+      var urlInput = document.getElementById('avatarUrlInput').value.trim();
       if (urlInput) {
         localStorage.setItem(STORAGE_KEY_AVATAR, urlInput);
         loadAvatar();
@@ -1006,11 +985,11 @@
     }
 
     function handleAvatarFile(e) {
-      const file = e.target.files[0];
+      var file = e.target.files[0];
       if (file) {
-        const reader = new FileReader();
+        var reader = new FileReader();
         reader.onload = function(event) {
-          const base64 = event.target.result;
+          var base64 = event.target.result;
           localStorage.setItem(STORAGE_KEY_AVATAR, base64);
           loadAvatar();
           closeModal('avatarModal');
@@ -1019,34 +998,24 @@
       }
     }
 
-    function openBookingModal() {
-      document.getElementById('bookingModal').classList.remove('hidden');
-    }
-    function openAvatarModal() {
-      document.getElementById('avatarModal').classList.remove('hidden');
-    }
-    function openAiModal() {
-      document.getElementById('aiModal').classList.remove('hidden');
-    }
-    function openClientModal() {
-      document.getElementById('clientModal').classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
+    function openBookingModal() { document.getElementById('bookingModal').classList.remove('hidden'); }
+    function openAvatarModal() { document.getElementById('avatarModal').classList.remove('hidden'); }
+    function openAiModal() { document.getElementById('aiModal').classList.remove('hidden'); }
+    function openClientModal() { document.getElementById('clientModal').classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     function exportToCSV() {
-      let csvContent = "\uFEFF";
+      var csvContent = "\uFEFF";
       csvContent += "日期,時間,客源類型,客戶姓名,項目,時長(分),牌價,傑森實拿,備註\n";
 
-      window.bookings.forEach(b => {
-        csvContent += `"${b.date}","${b.time}","${b.clientType === 'walkin' ? '散客' : '預約'}","${b.clientName}","${b.service}","${b.duration || 60}","${b.gross}","${b.net}","${b.notes || ''}"\n`;
+      window.bookings.forEach(function(b) {
+        csvContent += '"' + b.date + '","' + b.time + '","' + (b.clientType === 'walkin' ? '散客' : '預約') + '","' + b.clientName + '","' + b.service + '","' + (b.duration || 60) + '","' + b.gross + '","' + b.net + '","' + (b.notes || '') + '"\n';
       });
 
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `傑森按摩天地_收支報表_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = '傑森按摩天地_收支報表_' + new Date().toISOString().split('T')[0] + '.csv';
       link.click();
     }
 
@@ -1055,7 +1024,7 @@
     }
 
     function saveApiKey() {
-      const key = document.getElementById('geminiApiKeyInput').value.trim();
+      var key = document.getElementById('geminiApiKeyInput').value.trim();
       localStorage.setItem(STORAGE_KEY_API_KEY, key);
       updateApiKeyStatus();
       alert('Gemini API Key 已儲存！');
@@ -1063,8 +1032,9 @@
     }
 
     function updateApiKeyStatus() {
-      const key = localStorage.getItem(STORAGE_KEY_API_KEY);
-      const badge = document.getElementById('geminiStatusBadge');
+      var key = localStorage.getItem(STORAGE_KEY_API_KEY);
+      var badge = document.getElementById('geminiStatusBadge');
+      if (!badge) return;
       if (key) {
         badge.innerText = 'Gemini 智能連線中';
         badge.className = 'text-[10px] text-emerald-600 font-semibold';
@@ -1074,39 +1044,40 @@
       }
     }
 
-    function appendChatMessage(sender, text, isAi = false) {
-      const box = document.getElementById('aiChatBox');
-      const div = document.createElement('div');
+    function appendChatMessage(sender, text, isAi) {
+      var box = document.getElementById('aiChatBox');
+      if (!box) return;
+      var div = document.createElement('div');
       div.className = isAi 
         ? "bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-stone-700 space-y-1"
         : "bg-emerald-700 text-white p-2.5 rounded-2xl rounded-tr-none ml-auto max-w-[85%] text-right";
-      div.innerHTML = `<p class="whitespace-pre-line">${text}</p>`;
+      div.innerHTML = '<p class="whitespace-pre-line">' + text + '</p>';
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
     }
 
     async function handleAiChat(e) {
       e.preventDefault();
-      const input = document.getElementById('aiInput');
-      const prompt = input.value.trim();
+      var input = document.getElementById('aiInput');
+      var prompt = input.value.trim();
       if (!prompt) return;
 
       appendChatMessage('User', prompt, false);
       input.value = '';
 
-      const rawKey = localStorage.getItem(STORAGE_KEY_API_KEY);
+      var rawKey = localStorage.getItem(STORAGE_KEY_API_KEY);
       if (!rawKey) {
-        setTimeout(() => {
+        setTimeout(function() {
           appendChatMessage('AI', '目前處於本地模式。你可以點擊右上角 ⚙️ 設定 Google Gemini API Key 來獲得完整智能對話能力。也可以直接點選上方的快捷指令！', true);
         }, 300);
         return;
       }
 
       appendChatMessage('AI', '思考中...', true);
-      const cleanKey = rawKey.trim();
+      var cleanKey = rawKey.trim();
 
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`, {
+        var response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -1115,69 +1086,71 @@
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `你是按摩調理師「傑森」的工作站專業營運顧問。
-目前系統資料總覽：
-- 累積總客次：${window.bookings.length}
-- 熟客名單人數：${window.clients.length}
-請針對使用者的問題提供專業、溫暖、實用的營運或調理建議。
-
-使用者問題：${prompt}`
+                text: '你是按摩調理師「傑森」的工作站專業營運顧問。\n目前系統資料總覽：\n- 累積總客次：' + window.bookings.length + '\n- 熟客名單人數：' + window.clients.length + '\n請針對使用者的問題提供專業、溫暖、實用的營運或調理建議。\n\n使用者問題：' + prompt
               }]
             }]
           })
         });
 
-        const data = await response.json();
-        const box = document.getElementById('aiChatBox');
-        box.removeChild(box.lastChild);
+        var data = await response.json();
+        var box = document.getElementById('aiChatBox');
+        if (box && box.lastChild) box.removeChild(box.lastChild);
 
         if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
           appendChatMessage('AI', data.candidates[0].content.parts[0].text, true);
         } else {
-          appendChatMessage('AI', `連線回傳錯誤：${data.error ? data.error.message : '請檢查金鑰或網路'}`, true);
+          appendChatMessage('AI', '連線回傳錯誤：' + (data.error ? data.error.message : '請檢查金鑰或網路'), true);
         }
       } catch (err) {
-        const box = document.getElementById('aiChatBox');
-        if (box.lastChild) box.removeChild(box.lastChild);
+        var b = document.getElementById('aiChatBox');
+        if (b && b.lastChild) b.removeChild(b.lastChild);
         appendChatMessage('AI', '連線異常：' + err.message, true);
       }
     }
 
     function runAiQuickCommand(cmd) {
       if (cmd === 'diagnose') {
-        const walkin = window.bookings.filter(b => b.clientType === 'walkin').length;
-        const personal = window.bookings.filter(b => b.clientType === 'personal').length;
-        const total = window.bookings.reduce((sum, b) => sum + (b.net || 0), 0);
-        appendChatMessage('AI', `📊 傑森的營運簡報：\n- 總實拿：NT$ ${total.toLocaleString()}\n- 熟客比例：${window.bookings.length ? Math.round((personal/window.bookings.length)*100) : 0}%\n- 散客比例：${window.bookings.length ? Math.round((walkin/window.bookings.length)*100) : 0}%\n建議：主動記錄熟客常繃部位，在回訪時先一步關心！`, true);
+        var walkin = window.bookings.filter(function(b) { return b.clientType === 'walkin'; }).length;
+        var personal = window.bookings.filter(function(b) { return b.clientType === 'personal'; }).length;
+        var total = window.bookings.reduce(function(sum, b) { return sum + (b.net || 0); }, 0);
+        appendChatMessage('AI', '📊 傑森的營運簡報：\n- 總實拿：NT$ ' + total.toLocaleString() + '\n- 熟客比例：' + (window.bookings.length ? Math.round((personal/window.bookings.length)*100) : 0) + '%\n- 散客比例：' + (window.bookings.length ? Math.round((walkin/window.bookings.length)*100) : 0) + '%\n建議：主動記錄熟客常繃部位，在回訪時先一步關心！', true);
       } else if (cmd === 'password') {
-        const newPwd = prompt('請輸入新的訪問密碼：', getSystemPassword());
+        var newPwd = prompt('請輸入新的訪問密碼：', getSystemPassword());
         if (newPwd) {
           localStorage.setItem(STORAGE_KEY_PWD, newPwd.trim());
-          appendChatMessage('AI', `✅ 訪問密碼已成功更新！`, true);
+          appendChatMessage('AI', '✅ 訪問密碼已成功更新！', true);
         }
       } else if (cmd === 'backup') {
-        const backupData = {
+        var backupData = {
           bookings: window.bookings,
           clients: window.clients,
           password: getSystemPassword(),
           exportedAt: new Date().toISOString()
         };
-        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-        const link = document.createElement("a");
+        var blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        var link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `傑森按摩天地_全站備份_${new Date().toISOString().split('T')[0]}.json`;
+        link.download = '傑森按摩天地_全站備份_' + new Date().toISOString().split('T')[0] + '.json';
         link.click();
         appendChatMessage('AI', '💾 已將所有排程、熟客檔案下載為 JSON 備份檔！', true);
       }
     }
 
-    // 初始化檢查是否已驗證
-    if (sessionStorage.getItem(STORAGE_KEY_AUTH) === 'true') {
-      revealApp();
-    }
+    // 鍵盤監聽與初期檢查
+    window.addEventListener('DOMContentLoaded', function() {
+      var pwdInput = document.getElementById('unlockPwdInput');
+      if (pwdInput) {
+        pwdInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') checkUnlock();
+        });
+      }
+      if (sessionStorage.getItem(STORAGE_KEY_AUTH) === 'true') {
+        revealApp();
+      }
+    });
   </script>
 
-  <!-- ==================== 5. Firebase 雲端同步模組（非同步背景運作，完全不擋登入） ==================== -->
+  <!-- ==================== 5. Firebase 雲端同步模組 ==================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { 
@@ -1198,80 +1171,48 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // 掛載雲端作業函式
       window.cloudSyncBooking = async (bookingId, bookingData) => {
-        try {
-          await setDoc(doc(db, "bookings", bookingId), bookingData);
-        } catch (e) {
-          console.warn("雲端同步預約失敗，本地已儲存:", e);
-        }
+        try { await setDoc(doc(db, "bookings", bookingId), bookingData); } catch (e) {}
       };
 
       window.cloudUpdateBookingStatus = async (bookingId, status) => {
-        try {
-          await updateDoc(doc(db, "bookings", bookingId), { status });
-        } catch (e) {
-          console.warn("雲端更新預約狀態失敗:", e);
-        }
+        try { await updateDoc(doc(db, "bookings", bookingId), { status }); } catch (e) {}
       };
 
       window.cloudDeleteBooking = async (bookingId) => {
-        try {
-          await deleteDoc(doc(db, "bookings", bookingId));
-        } catch (e) {
-          console.warn("雲端刪除失敗:", e);
-        }
+        try { await deleteDoc(doc(db, "bookings", bookingId)); } catch (e) {}
       };
 
       window.cloudSyncClient = async (clientId, clientData) => {
-        try {
-          await setDoc(doc(db, "clients", clientId), clientData);
-        } catch (e) {
-          console.warn("雲端同步熟客失敗:", e);
-        }
+        try { await setDoc(doc(db, "clients", clientId), clientData); } catch (e) {}
       };
 
-      // 監聽雲端資料變更
       onSnapshot(collection(db, "bookings"), (snapshot) => {
         const remoteBookings = [];
-        snapshot.forEach(d => {
-          remoteBookings.push({ id: d.id, ...d.data() });
-        });
+        snapshot.forEach(d => { remoteBookings.push({ id: d.id, ...d.data() }); });
         if (remoteBookings.length > 0) {
           remoteBookings.sort((a, b) => (b.date + ' ' + b.time).localeCompare(a.date + ' ' + a.time));
           window.bookings = remoteBookings;
           localStorage.setItem('jason_massage_bookings', JSON.stringify(remoteBookings));
-          if (document.getElementById('lockScreen').classList.contains('hidden')) {
+          if (sessionStorage.getItem('jason_massage_authenticated') === 'true') {
             window.renderAllViews();
           }
         }
-      }, (err) => {
-        console.warn("Firestore bookings 即時連線狀態:", err);
-      });
+      }, (err) => {});
 
       onSnapshot(collection(db, "clients"), (snapshot) => {
         const remoteClients = [];
-        snapshot.forEach(d => {
-          remoteClients.push({ id: d.id, ...d.data() });
-        });
+        snapshot.forEach(d => { remoteClients.push({ id: d.id, ...d.data() }); });
         if (remoteClients.length > 0) {
           window.clients = remoteClients;
           localStorage.setItem('jason_massage_clients', JSON.stringify(remoteClients));
-          if (document.getElementById('lockScreen').classList.contains('hidden')) {
+          if (sessionStorage.getItem('jason_massage_authenticated') === 'true') {
             window.renderClients();
           }
         }
-      }, (err) => {
-        console.warn("Firestore clients 即時連線狀態:", err);
-      });
+      }, (err) => {});
 
-    } catch (err) {
-      console.warn("Firebase 啟動略過，已使用純本機模式:", err);
-      const dotD = document.getElementById('syncDotDesktop');
-      const dotM = document.getElementById('syncDotMobile');
-      if (dotD) dotD.className = "w-2 h-2 rounded-full bg-stone-400";
-      if (dotM) dotM.className = "w-1.5 h-1.5 rounded-full bg-stone-400";
-    }
+    } catch (err) {}
   </script>
 </body>
 </html>
