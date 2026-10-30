@@ -72,4 +72,881 @@
           </div>
         </div>
         <div>
-          <h1 class="font-bold text-stone
+          <h1 class="font-bold text-stone-800 text-base">傑森的按摩天地</h1>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span id="syncDotDesktop" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <p id="cloudSyncStatusDesktop" class="text-[11px] text-emerald-700 font-medium">雲端同步運作中</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 導航連結 -->
+      <nav class="mt-6 flex-1 space-y-1">
+        <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-800 bg-emerald-50 transition-all" data-tab="dashboard">
+          <i class="fa-solid fa-chart-pie w-5"></i><span>營運儀表板</span>
+        </button>
+        <button onclick="switchTab('appointments')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 transition-all" data-tab="appointments">
+          <i class="fa-solid fa-calendar-check w-5"></i><span>預約排程</span>
+        </button>
+        <button onclick="switchTab('clients')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 transition-all" data-tab="clients">
+          <i class="fa-solid fa-user-tag w-5"></i><span>熟客身體檔案</span>
+        </button>
+        <button onclick="switchTab('finance')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 transition-all" data-tab="finance">
+          <i class="fa-solid fa-wallet w-5"></i><span>財務明細</span>
+        </button>
+      </nav>
+
+      <!-- 側欄底部動作 -->
+      <div class="pt-4 border-t border-stone-100 space-y-2">
+        <button onclick="openAiModal()" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-xs font-semibold rounded-xl shadow-sm hover:opacity-90 transition-all">
+          <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI 後台助理</span>
+        </button>
+        <button onclick="lockSystem()" class="w-full flex items-center justify-center gap-2 py-2 px-3 text-stone-400 hover:text-stone-700 text-xs transition-all">
+          <i class="fa-solid fa-lock"></i><span>鎖定系統</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 主內容區 -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+      
+      <!-- 手機頂部 Header -->
+      <header class="md:hidden bg-white border-b border-stone-200 px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-2.5">
+          <img id="mobileAvatar" onclick="openAvatarModal()" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" 
+               class="w-8 h-8 rounded-full object-cover border border-emerald-600 cursor-pointer">
+          <div>
+            <h1 class="font-bold text-stone-800 text-sm">傑森的按摩天地</h1>
+            <div class="flex items-center gap-1">
+              <span id="syncDotMobile" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <p id="cloudSyncStatusMobile" class="text-[10px] text-emerald-700 font-medium">雲端同步中</p>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openAiModal()" class="px-2.5 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium flex items-center gap-1">
+            <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI 後台</span>
+          </button>
+          <button onclick="lockSystem()" class="p-2 text-stone-400 hover:text-stone-600">
+            <i class="fa-solid fa-lock"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- 主要內容頁面 -->
+      <div class="p-4 md:p-8 max-w-6xl mx-auto w-full space-y-6">
+
+        <!-- ===== Tab 1: 營運儀表板 ===== -->
+        <section id="view-dashboard" class="tab-view space-y-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+              <span class="text-xs text-stone-400 font-medium">本月傑森實拿</span>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span class="text-xs font-semibold text-emerald-700">NT$</span>
+                <span id="statMonthlyNet" class="text-xl md:text-2xl font-black text-emerald-800 font-mono">0</span>
+              </div>
+              <span class="text-[10px] text-stone-400 mt-1 block">客牌價: NT$ <span id="statMonthlyGross">0</span></span>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+              <span class="text-xs text-stone-400 font-medium">本月服務客次</span>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span id="statMonthlyClients" class="text-xl md:text-2xl font-black text-stone-800 font-mono">0</span>
+                <span class="text-xs text-stone-500">人次</span>
+              </div>
+              <span class="text-[10px] text-stone-400 mt-1 block">散客: <span id="statWalkinCount">0</span> · 預約: <span id="statBookedCount">0</span></span>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+              <span class="text-xs text-stone-400 font-medium">平均每位實拿</span>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span class="text-xs font-semibold text-stone-500">NT$</span>
+                <span id="statAvgNetPerClient" class="text-xl md:text-2xl font-black text-stone-800 font-mono">0</span>
+              </div>
+              <span class="text-[10px] text-emerald-600 mt-1 block font-medium">實際收益比</span>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
+              <span class="text-xs text-stone-400 font-medium">今日預約客數</span>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span id="statTodayBookings" class="text-xl md:text-2xl font-black text-emerald-600 font-mono">0</span>
+                <span class="text-xs text-stone-500">位</span>
+              </div>
+              <span class="text-[10px] text-stone-400 mt-1 block">今日實拿: NT$ <span id="statTodayNet">0</span></span>
+            </div>
+          </div>
+
+          <!-- 快捷操作與今日清單 -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-stone-800 flex items-center gap-2">
+                  <i class="fa-solid fa-list-check text-emerald-600"></i>
+                  <span>今日待辦排程</span>
+                </h3>
+                <button onclick="openBookingModal()" class="px-3 py-1.5 bg-emerald-700 text-white rounded-xl text-xs font-semibold hover:bg-emerald-800 transition-all shadow-sm">
+                  <i class="fa-solid fa-plus mr-1"></i>新增預約
+                </button>
+              </div>
+
+              <div id="todayBookingsList" class="space-y-2.5">
+                <!-- 今日預約卡片 -->
+              </div>
+            </div>
+
+            <!-- 近 7 天實拿走勢 -->
+            <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+              <h3 class="font-bold text-stone-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-chart-line text-emerald-600"></i>
+                <span>近 7 天實拿走勢</span>
+              </h3>
+              <div class="h-44 relative">
+                <canvas id="weeklyRevenueChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== Tab 2: 預約排程 ===== -->
+        <section id="view-appointments" class="tab-view hidden space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-stone-800">全部排程紀錄</h2>
+            <button onclick="openBookingModal()" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-sm font-semibold hover:bg-emerald-800 transition-all flex items-center justify-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-plus"></i><span>新增預約 / 散客</span>
+            </button>
+          </div>
+
+          <div id="allBookingsList" class="space-y-3">
+            <!-- 排程列表 -->
+          </div>
+        </section>
+
+        <!-- ===== Tab 3: 熟客身體檔案 ===== -->
+        <section id="view-clients" class="tab-view hidden space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg font-bold text-stone-800">熟客身體檔案 (CRM)</h2>
+              <p class="text-xs text-stone-400">散客不記錄；此處僅收錄個人預約客</p>
+            </div>
+            <button onclick="openClientModal()" class="px-4 py-2 bg-stone-800 text-white rounded-xl text-sm font-medium hover:bg-black transition-all">
+              <i class="fa-solid fa-user-plus mr-1"></i>建立新客戶檔
+            </button>
+          </div>
+
+          <div id="clientGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- 熟客卡片 -->
+          </div>
+        </section>
+
+        <!-- ===== Tab 4: 財務收支 ===== -->
+        <section id="view-finance" class="tab-view hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-stone-800">財務與結算明細</h2>
+            <button onclick="exportToCSV()" class="px-3.5 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-semibold transition-all">
+              <i class="fa-solid fa-file-csv mr-1"></i>匯出報表 (CSV)
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs text-stone-600">
+                <thead class="bg-stone-50 border-b border-stone-200 text-stone-400 font-semibold uppercase">
+                  <tr>
+                    <th class="p-3.5">日期時間</th>
+                    <th class="p-3.5">類型</th>
+                    <th class="p-3.5">客名</th>
+                    <th class="p-3.5">項目 (時長)</th>
+                    <th class="p-3.5 text-right">客人牌價</th>
+                    <th class="p-3.5 text-right text-emerald-700">傑森實拿</th>
+                  </tr>
+                </thead>
+                <tbody id="financeTableBody" class="divide-y divide-stone-100 font-medium">
+                  <!-- 明細列表 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- 手機底部導航列 -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 py-2 px-4 flex justify-around items-center z-30 shadow-lg">
+      <button onclick="switchTab('dashboard')" class="mobile-nav-btn flex flex-col items-center text-emerald-800" data-tab="dashboard">
+        <i class="fa-solid fa-chart-pie text-lg"></i>
+        <span class="text-[10px] mt-0.5">總覽</span>
+      </button>
+      <button onclick="switchTab('appointments')" class="mobile-nav-btn flex flex-col items-center text-stone-400" data-tab="appointments">
+        <i class="fa-solid fa-calendar-check text-lg"></i>
+        <span class="text-[10px] mt-0.5">預約</span>
+      </button>
+      <button onclick="openBookingModal()" class="w-10 h-10 bg-emerald-700 text-white rounded-full flex items-center justify-center text-base shadow-md -mt-4 active:scale-90 transition-transform">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button onclick="switchTab('clients')" class="mobile-nav-btn flex flex-col items-center text-stone-400" data-tab="clients">
+        <i class="fa-solid fa-user-tag text-lg"></i>
+        <span class="text-[10px] mt-0.5">熟客</span>
+      </button>
+      <button onclick="switchTab('finance')" class="mobile-nav-btn flex flex-col items-center text-stone-400" data-tab="finance">
+        <i class="fa-solid fa-wallet text-lg"></i>
+        <span class="text-[10px] mt-0.5">財務</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==================== 3. 模態彈窗區 ==================== -->
+
+  <!-- 新增預約彈窗 -->
+  <div id="bookingModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+        <h3 class="font-bold text-stone-800 text-base">新增服務排程</h3>
+        <button onclick="closeModal('bookingModal')" class="text-stone-400 hover:text-stone-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="bookingForm" onsubmit="handleSaveBooking(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1.5">客源類型</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btnTypePersonal" onclick="setClientType('personal')" 
+                    class="py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold transition-all text-center">
+              個人預約客
+            </button>
+            <button type="button" id="btnTypeWalkin" onclick="setClientType('walkin')" 
+                    class="py-2.5 px-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-500 text-xs font-medium transition-all text-center">
+              散客（工作室自來客）
+            </button>
+          </div>
+        </div>
+
+        <div id="clientNameField">
+          <label class="block text-xs font-semibold text-stone-600 mb-1">客戶姓名 / 稱呼</label>
+          <input type="text" id="bookingClientName" required placeholder="例如：陳先生、王小姐" 
+                 class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+        </div>
+
+        <div id="clientPhoneField">
+          <label class="block text-xs font-semibold text-stone-600 mb-1">聯絡電話</label>
+          <input type="tel" id="bookingClientPhone" placeholder="09xx-xxx-xxx" 
+                 class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">服務項目</label>
+            <select id="bookingService" onchange="handleServiceChange()" class="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium">
+              <option value="全身指壓">全身指壓</option>
+              <option value="腳底按摩">腳底按摩</option>
+              <option value="custom">➕ 自訂項目</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">服務時長</label>
+            <select id="bookingDuration" class="w-full px-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium">
+              <option value="30">30 分鐘</option>
+              <option value="60" selected>60 分鐘</option>
+              <option value="90">90 分鐘</option>
+              <option value="120">120 分鐘</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="customServiceField" class="hidden">
+          <label class="block text-xs font-semibold text-stone-600 mb-1">自訂項目名稱</label>
+          <input type="text" id="bookingCustomServiceName" placeholder="如：深層油壓、刮痧拔罐" 
+                 class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">日期</label>
+            <input type="date" id="bookingDate" required class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">開始時間</label>
+            <input type="time" id="bookingTime" required class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm">
+          </div>
+        </div>
+
+        <div class="p-3 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-stone-500 mb-1">牌價 (客付金額)</label>
+              <input type="number" id="bookingGross" placeholder="1000" oninput="autoCalculateNet()" 
+                     class="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-sm font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-emerald-800 mb-1">傑森實拿</label>
+              <input type="number" id="bookingNet" placeholder="500" required 
+                     class="w-full px-3 py-2 bg-white border border-emerald-500 rounded-xl text-sm font-mono font-bold text-emerald-800">
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px] text-stone-500">
+            <span>快速抽成比：</span>
+            <button type="button" onclick="applySplit(0.5)" class="px-2 py-0.5 bg-white border border-stone-200 rounded-md hover:bg-stone-100">50%</button>
+            <button type="button" onclick="applySplit(0.55)" class="px-2 py-0.5 bg-white border border-stone-200 rounded-md hover:bg-stone-100">55%</button>
+            <button type="button" onclick="applySplit(0.6)" class="px-2 py-0.5 bg-white border border-stone-200 rounded-md hover:bg-stone-100">60%</button>
+            <button type="button" onclick="applySplit(0.7)" class="px-2 py-0.5 bg-white border border-stone-200 rounded-md hover:bg-stone-100">70%</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">排程備註 / 身體狀況</label>
+          <textarea id="bookingNotes" rows="2" placeholder="如：肩頸特別硬、不喜精油味道、需加強腰部" 
+                    class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-md transition-all">
+          儲存並同步至雲端
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 大頭貼修改彈窗 -->
+  <div id="avatarModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-stone-100">
+        <h3 class="font-bold text-stone-800">更換傑森的專屬頭貼</h3>
+        <button onclick="closeModal('avatarModal')" class="text-stone-400 hover:text-stone-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="space-y-4 text-center">
+        <img id="avatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" 
+             class="w-24 h-24 rounded-full object-cover border-4 border-emerald-600 mx-auto shadow-md">
+        
+        <div class="space-y-2">
+          <label class="block w-full py-2.5 bg-emerald-50 text-emerald-800 rounded-xl text-xs font-semibold cursor-pointer hover:bg-emerald-100 transition-all">
+            <i class="fa-solid fa-upload mr-1"></i>從裝置選擇照片
+            <input type="file" id="avatarFileInput" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
+          </label>
+          <input type="text" id="avatarUrlInput" placeholder="或貼上照片網址 (URL)" 
+                 class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs">
+        </div>
+        <button onclick="saveAvatar()" class="w-full py-2.5 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800">
+          確認儲存頭貼
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI 後台助理彈窗 -->
+  <div id="aiModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-stone-800 text-sm">AI 後台助手</h3>
+            <span id="geminiStatusBadge" class="text-[10px] text-stone-400">本地離線模式</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleApiKeyInput()" class="p-1.5 text-stone-400 hover:text-stone-700" title="設定 Gemini API Key">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+          <button onclick="closeModal('aiModal')" class="p-1.5 text-stone-400 hover:text-stone-700">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="apiKeySection" class="hidden p-3 bg-stone-50 rounded-xl space-y-2 border border-stone-200">
+        <label class="block text-xs font-semibold text-stone-700">Google Gemini API Key</label>
+        <div class="flex gap-2">
+          <input type="password" id="geminiApiKeyInput" placeholder="貼上 Gemini API Key" 
+                 class="flex-1 px-3 py-1.5 bg-white border border-stone-200 rounded-lg text-xs font-mono">
+          <button onclick="saveApiKey()" class="px-3 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium">儲存</button>
+        </div>
+        <p class="text-[10px] text-stone-400">金鑰直接存於本地，支援 AQ. 或 AIza 開頭格式。</p>
+      </div>
+
+      <div class="flex flex-wrap gap-1.5">
+        <button onclick="runAiQuickCommand('diagnose')" class="px-2.5 py-1 bg-stone-100 hover:bg-emerald-50 hover:text-emerald-700 text-stone-600 rounded-lg text-xs font-medium">
+          📊 本月實拿營運診斷
+        </button>
+        <button onclick="runAiQuickCommand('password')" class="px-2.5 py-1 bg-stone-100 hover:bg-emerald-50 hover:text-emerald-700 text-stone-600 rounded-lg text-xs font-medium">
+          🔑 修改訪問密碼
+        </button>
+        <button onclick="runAiQuickCommand('backup')" class="px-2.5 py-1 bg-stone-100 hover:bg-emerald-50 hover:text-emerald-700 text-stone-600 rounded-lg text-xs font-medium">
+          💾 備份全站資料
+        </button>
+      </div>
+
+      <div id="aiChatBox" class="flex-1 min-h-[200px] max-h-[300px] overflow-y-auto space-y-2 p-3 bg-stone-50 rounded-2xl border border-stone-100 text-xs">
+        <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-stone-700 space-y-1">
+          <p class="font-semibold text-emerald-800">傑森你好！我是你的工作站 AI 助手。</p>
+          <p>已連接雲端同步架構，有任何排班或經營問題隨時問我！</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleAiChat(event)" class="flex gap-2 pt-1">
+        <input type="text" id="aiInput" placeholder="問問 AI 經營數據或輸入指令..." 
+               class="flex-1 px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-emerald-600">
+        <button type="submit" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl text-xs font-semibold hover:bg-emerald-800">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 新增客戶檔案彈窗 -->
+  <div id="clientModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-stone-100">
+        <h3 class="font-bold text-stone-800">建立熟客身體檔案</h3>
+        <button onclick="closeModal('clientModal')" class="text-stone-400 hover:text-stone-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <form onsubmit="handleSaveClientManual(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">姓名</label>
+          <input type="text" id="manualClientName" required class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">電話</label>
+          <input type="tel" id="manualClientPhone" required class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">偏好力道</label>
+          <select id="manualClientPressure" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium">
+            <option value="深層重力道">深層重力道</option>
+            <option value="適中均勻" selected>適中均勻</option>
+            <option value="輕柔放鬆">輕柔放鬆</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">緊繃部位 / 備註</label>
+          <textarea id="manualClientNotes" rows="2" placeholder="如：肩頸高硬度、腰部酸、右腿舊傷" 
+                    class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs"></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-stone-800 text-white font-bold rounded-xl text-xs hover:bg-black">
+          儲存並同步至雲端
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==================== 4. 核心業務邏輯（零外部相依，確保秒進） ==================== -->
+  <script>
+    const STORAGE_KEY_AUTH = 'jason_massage_authenticated';
+    const STORAGE_KEY_PWD = 'jason_massage_password';
+    const STORAGE_KEY_AVATAR = 'jason_massage_avatar';
+    const STORAGE_KEY_API_KEY = 'jason_massage_gemini_key';
+    const DEFAULT_PWD = '562004';
+
+    window.bookings = JSON.parse(localStorage.getItem('jason_massage_bookings') || '[]');
+    window.clients = JSON.parse(localStorage.getItem('jason_massage_clients') || '[]');
+    let weeklyChartInstance = null;
+    let currentClientType = 'personal';
+
+    function getSystemPassword() {
+      return localStorage.getItem(STORAGE_KEY_PWD) || DEFAULT_PWD;
+    }
+
+    // 核心驗證函數：保證不受任何其他代碼阻礙
+    function checkUnlock() {
+      const input = document.getElementById('unlockPwdInput');
+      const errorMsg = document.getElementById('pwdErrorMsg');
+      const currentPwd = getSystemPassword();
+
+      if (input.value.trim() === currentPwd.trim()) {
+        if (errorMsg) errorMsg.classList.add('hidden');
+        sessionStorage.setItem(STORAGE_KEY_AUTH, 'true');
+        revealApp();
+      } else {
+        if (errorMsg) errorMsg.classList.remove('hidden');
+        input.classList.add('border-red-500');
+        input.focus();
+      }
+    }
+
+    function forceResetPassword() {
+      localStorage.setItem(STORAGE_KEY_PWD, DEFAULT_PWD);
+      alert('密碼已恢復為預設值：562004');
+      const input = document.getElementById('unlockPwdInput');
+      input.value = DEFAULT_PWD;
+      checkUnlock();
+    }
+
+    function lockSystem() {
+      sessionStorage.removeItem(STORAGE_KEY_AUTH);
+      document.getElementById('appContainer').classList.add('hidden');
+      document.getElementById('lockScreen').classList.remove('hidden');
+      document.getElementById('unlockPwdInput').value = '';
+    }
+
+    function revealApp() {
+      document.getElementById('lockScreen').classList.add('hidden');
+      document.getElementById('appContainer').classList.remove('hidden');
+      try {
+        initAppComponents();
+      } catch (e) {
+        console.warn('UI 初始化容錯處理:', e);
+      }
+    }
+
+    document.getElementById('unlockPwdInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkUnlock();
+    });
+
+    function initAppComponents() {
+      renderAllViews();
+      loadAvatar();
+      updateApiKeyStatus();
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('bookingDate');
+      if (dateInput && !dateInput.value) dateInput.value = todayStr;
+    }
+
+    window.renderAllViews = function() {
+      renderStats();
+      renderTodayList();
+      renderAllBookings();
+      renderClients();
+      renderFinanceTable();
+      renderWeeklyChart();
+    };
+
+    function setClientType(type) {
+      currentClientType = type;
+      const btnPersonal = document.getElementById('btnTypePersonal');
+      const btnWalkin = document.getElementById('btnTypeWalkin');
+      const phoneField = document.getElementById('clientPhoneField');
+      const nameInput = document.getElementById('bookingClientName');
+
+      if (type === 'walkin') {
+        btnWalkin.className = "py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold text-center";
+        btnPersonal.className = "py-2.5 px-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-500 text-xs font-medium text-center";
+        phoneField.classList.add('hidden');
+        nameInput.value = '散客';
+        nameInput.readOnly = true;
+      } else {
+        btnPersonal.className = "py-2.5 px-3 rounded-xl border border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-bold text-center";
+        btnWalkin.className = "py-2.5 px-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-500 text-xs font-medium text-center";
+        phoneField.classList.remove('hidden');
+        if (nameInput.value === '散客') nameInput.value = '';
+        nameInput.readOnly = false;
+      }
+    }
+
+    function handleServiceChange() {
+      const serviceVal = document.getElementById('bookingService').value;
+      const customField = document.getElementById('customServiceField');
+      if (serviceVal === 'custom') {
+        customField.classList.remove('hidden');
+      } else {
+        customField.classList.add('hidden');
+      }
+    }
+
+    function applySplit(ratio) {
+      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      if (gross > 0) {
+        document.getElementById('bookingNet').value = Math.round(gross * ratio);
+      }
+    }
+
+    function autoCalculateNet() {
+      const gross = parseFloat(document.getElementById('bookingGross').value) || 0;
+      const netInput = document.getElementById('bookingNet');
+      if (!netInput.value || netInput.value == 0) {
+        netInput.value = Math.round(gross * 0.6);
+      }
+    }
+
+    // 儲存預約
+    async function handleSaveBooking(e) {
+      e.preventDefault();
+      const serviceSelect = document.getElementById('bookingService').value;
+      const customServiceName = document.getElementById('bookingCustomServiceName').value.trim();
+      const finalService = serviceSelect === 'custom' ? (customServiceName || '自訂服務') : serviceSelect;
+      const bookingId = 'b_' + Date.now();
+
+      const bookingData = {
+        clientType: currentClientType,
+        clientName: document.getElementById('bookingClientName').value.trim(),
+        clientPhone: currentClientType === 'walkin' ? '' : document.getElementById('bookingClientPhone').value.trim(),
+        service: finalService,
+        duration: document.getElementById('bookingDuration').value,
+        date: document.getElementById('bookingDate').value,
+        time: document.getElementById('bookingTime').value,
+        gross: parseFloat(document.getElementById('bookingGross').value) || 0,
+        net: parseFloat(document.getElementById('bookingNet').value) || 0,
+        notes: document.getElementById('bookingNotes').value.trim(),
+        status: 'confirmed',
+        createdAt: new Date().toISOString()
+      };
+
+      // 本地優先更新
+      window.bookings.unshift({ id: bookingId, ...bookingData });
+      localStorage.setItem('jason_massage_bookings', JSON.stringify(window.bookings));
+      window.renderAllViews();
+
+      // 若有雲端則背景同步
+      if (window.cloudSyncBooking) {
+        window.cloudSyncBooking(bookingId, bookingData);
+      }
+
+      closeModal('bookingModal');
+      document.getElementById('bookingForm').reset();
+      setClientType('personal');
+    }
+
+    // 切換預約狀態
+    async function toggleComplete(bookingId) {
+      const item = window.bookings.find(b => b.id === bookingId);
+      if (!item) return;
+
+      item.status = item.status === 'completed' ? 'confirmed' : 'completed';
+      localStorage.setItem('jason_massage_bookings', JSON.stringify(window.bookings));
+      window.renderAllViews();
+
+      if (window.cloudUpdateBookingStatus) {
+        window.cloudUpdateBookingStatus(bookingId, item.status);
+      }
+    }
+
+    // 刪除預約
+    async function deleteBooking(bookingId) {
+      if (!confirm('確定要刪除這筆排程紀錄嗎？')) return;
+
+      window.bookings = window.bookings.filter(b => b.id !== bookingId);
+      localStorage.setItem('jason_massage_bookings', JSON.stringify(window.bookings));
+      window.renderAllViews();
+
+      if (window.cloudDeleteBooking) {
+        window.cloudDeleteBooking(bookingId);
+      }
+    }
+
+    // 手動新增客戶
+    async function handleSaveClientManual(e) {
+      e.preventDefault();
+      const clientId = 'c_' + Date.now();
+      const clientData = {
+        name: document.getElementById('manualClientName').value.trim(),
+        phone: document.getElementById('manualClientPhone').value.trim(),
+        pressure: document.getElementById('manualClientPressure').value,
+        notes: document.getElementById('manualClientNotes').value.trim()
+      };
+
+      window.clients.push({ id: clientId, ...clientData });
+      localStorage.setItem('jason_massage_clients', JSON.stringify(window.clients));
+      renderClients();
+
+      if (window.cloudSyncClient) {
+        window.cloudSyncClient(clientId, clientData);
+      }
+
+      closeModal('clientModal');
+    }
+
+    function renderStats() {
+      const now = new Date();
+      const currentMonthStr = now.toISOString().slice(0, 7);
+      const todayStr = now.toISOString().split('T')[0];
+
+      let monthlyGross = 0;
+      let monthlyNet = 0;
+      let monthlyCount = 0;
+      let walkinCount = 0;
+      let bookedCount = 0;
+      let todayCount = 0;
+      let todayNet = 0;
+
+      window.bookings.forEach(b => {
+        if (b.date && b.date.startsWith(currentMonthStr)) {
+          monthlyGross += (b.gross || 0);
+          monthlyNet += (b.net || 0);
+          monthlyCount++;
+          if (b.clientType === 'walkin') walkinCount++;
+          else bookedCount++;
+        }
+        if (b.date === todayStr) {
+          todayCount++;
+          todayNet += (b.net || 0);
+        }
+      });
+
+      document.getElementById('statMonthlyNet').innerText = monthlyNet.toLocaleString();
+      document.getElementById('statMonthlyGross').innerText = monthlyGross.toLocaleString();
+      document.getElementById('statMonthlyClients').innerText = monthlyCount;
+      document.getElementById('statWalkinCount').innerText = walkinCount;
+      document.getElementById('statBookedCount').innerText = bookedCount;
+      document.getElementById('statAvgNetPerClient').innerText = monthlyCount > 0 ? Math.round(monthlyNet / monthlyCount).toLocaleString() : 0;
+      document.getElementById('statTodayBookings').innerText = todayCount;
+      document.getElementById('statTodayNet').innerText = todayNet.toLocaleString();
+    }
+
+    function renderTodayList() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const listContainer = document.getElementById('todayBookingsList');
+      const todayItems = window.bookings.filter(b => b.date === todayStr);
+
+      if (todayItems.length === 0) {
+        listContainer.innerHTML = `
+          <div class="py-8 text-center text-stone-400 text-xs">
+            <i class="fa-solid fa-mug-hot text-2xl mb-2 text-stone-300 block"></i>
+            今日暫無排程，好好放鬆補充體力！
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = todayItems.map(item => `
+        <div class="p-3.5 rounded-xl border ${item.status === 'completed' ? 'bg-stone-50 border-stone-200 opacity-60' : 'bg-emerald-50/40 border-emerald-200'} flex items-center justify-between transition-all">
+          <div class="flex items-center gap-3">
+            <div class="font-mono text-xs font-bold ${item.status === 'completed' ? 'text-stone-400' : 'text-emerald-800'}">
+              ${item.time || '--:--'}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-stone-800">${item.clientName}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${item.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                  ${item.clientType === 'walkin' ? '散客' : '預約'}
+                </span>
+              </div>
+              <p class="text-xs text-stone-500 mt-0.5">
+                ${item.service} (${item.duration || 60}分) · 實拿 NT$${item.net}
+              </p>
+            </div>
+          </div>
+          <button onclick="toggleComplete('${item.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${item.status === 'completed' ? 'bg-stone-200 text-stone-600' : 'bg-emerald-700 text-white shadow-sm'}">
+            ${item.status === 'completed' ? '已完成' : '一鍵結案'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderAllBookings() {
+      const container = document.getElementById('allBookingsList');
+      if (window.bookings.length === 0) {
+        container.innerHTML = `<p class="text-center text-stone-400 text-xs py-8">尚無任何排程紀錄</p>`;
+        return;
+      }
+
+      container.innerHTML = window.bookings.map(item => `
+        <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold text-stone-400">${item.date} ${item.time}</span>
+              <span class="text-sm font-bold text-stone-800">${item.clientName}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold ${item.clientType === 'walkin' ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}">
+                ${item.clientType === 'walkin' ? '散客' : '預約客'}
+              </span>
+            </div>
+            <div class="text-xs text-stone-500">
+              ${item.service} · ${item.duration || 60}分鐘 · 牌價 NT$${item.gross} · <strong class="text-emerald-700">傑森實拿 NT$${item.net}</strong>
+            </div>
+            ${item.notes ? `<div class="text-xs text-stone-400 italic">備註：${item.notes}</div>` : ''}
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-auto">
+            <button onclick="toggleComplete('${item.id}')" class="px-3 py-1.5 rounded-xl text-xs font-medium ${item.status === 'completed' ? 'bg-stone-100 text-stone-500' : 'bg-emerald-100 text-emerald-800'}">
+              ${item.status === 'completed' ? '設為未結案' : '標記完成'}
+            </button>
+            <button onclick="deleteBooking('${item.id}')" class="p-1.5 text-stone-300 hover:text-red-500 transition-colors">
+              <i class="fa-solid fa-trash-can text-sm"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.renderClients = function() {
+      const container = document.getElementById('clientGrid');
+      if (window.clients.length === 0) {
+        container.innerHTML = `<p class="col-span-full text-center text-stone-400 text-xs py-8">尚無熟客檔案</p>`;
+        return;
+      }
+
+      container.innerHTML = window.clients.map(c => `
+        <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-stone-800 text-sm">${c.name}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 font-medium">${c.pressure || '適中'}</span>
+          </div>
+          <p class="text-xs font-mono text-stone-400"><i class="fa-solid fa-phone text-[10px] mr-1"></i>${c.phone || '無電話'}</p>
+          <div class="pt-2 border-t border-stone-100 text-xs text-stone-500">
+            ${c.notes || '尚未填寫身體狀況偏好'}
+          </div>
+        </div>
+      `).join('');
+    };
+
+    function renderFinanceTable() {
+      const tbody = document.getElementById('financeTableBody');
+      if (window.bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-stone-400">尚無財務收支明細</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = window.bookings.map(b => `
+        <tr class="hover:bg-stone-50/80 transition-colors">
+          <td class="p-3.5 font-mono text-stone-500">${b.date} ${b.time}</td>
+          <td class="p-3.5">
+            <span class="text-[10px] px-2 py-0.5 rounded-md ${b.clientType === 'walkin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+              ${b.clientType === 'walkin' ? '散客' : '預約'}
+            </span>
+          </td>
+          <td class="p-3.5 font-bold text-stone-800">${b.clientName}</td>
+          <td class="p-3.5">${b.service} (${b.duration || 60}分)</td>
+          <td class="p-3.5 text-right font-mono text-stone-400">NT$ ${b.gross || 0}</td>
+          <td class="p-3.5 text-right font-mono font-bold text-emerald-700">NT$ ${b.net || 0}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderWeeklyChart() {
+      const ctx = document.getElementById('weeklyRevenueChart');
+      if (!ctx) return;
+
+      const labels = [];
+      const dataNet = [];
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+
+        const dayTotal = window.bookings
+          .filter(b => b.date === dateStr)
+          .reduce((sum, b) => sum + (b.net || 0), 0);
+        dataNet.push(dayTotal);
+      }
+
+      if (weeklyChartInstance) {
+        weeklyChartInstance.destroy();
+      }
+
+      try {
+        weeklyChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: '傑森實拿',
+              data: dataNet,
+              borderColor: '#2d6a4f',
+              backgroundColor: 'rgba(45, 106, 79, 0.1)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2,
+              pointBackgroundColor: '#1b4332',
+              pointRadius: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
