@@ -44,14 +44,14 @@
         </div>
         <p id="pwdErrorMsg" class="text-xs text-red-500 hidden font-medium">密碼不正確，請重新輸入</p>
         
-        <button id="btnUnlock" onclick="checkUnlock()" class="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+        <button id="btnUnlock" type="button" onclick="checkUnlock()" class="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
           <i class="fa-solid fa-lock-open"></i>
           <span>解鎖進入系統</span>
         </button>
       </div>
 
       <div class="mt-4 pt-4 border-t border-stone-100">
-        <button onclick="forceResetPassword()" class="text-xs text-stone-400 hover:text-emerald-700 underline">
+        <button type="button" onclick="forceResetPassword()" class="text-xs text-stone-400 hover:text-emerald-700 underline">
           忘記密碼？恢復預設
         </button>
       </div>
@@ -72,14 +72,4 @@
           </div>
         </div>
         <div>
-          <h1 class="font-bold text-stone-800 text-base">傑森的按摩天地</h1>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <p id="cloudSyncStatusDesktop" class="text-[11px] text-emerald-700 font-medium">雲端即時連線</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 導航連結 -->
-      <nav class="mt-6 flex-1 space-y-1">
-        <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-800 bg-emerald-50 transition-all" data
+          <h1 class="font-bold text-stone
